@@ -48,3 +48,5 @@ router.post('/register', registerValidators,
 			console.log(err)
 		}
 })
+
+module.exports = router
