@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator')
 const { hash, compare } = require('bcryptjs')
 const config = require('config')
 const jwt = require('jsonwebtoken')
-const { registerValidators } = require('../utils/validators')
+const { registerValidators, loginValidators } = require('../utils/validators')
 const User = require('../models/User')
 const nodemailer = require('nodemailer')
 const sendgrid = require('nodemailer-sendgrid-transport')
@@ -45,8 +45,48 @@ router.post('/register', registerValidators,
 				message: `Пользователь ${name} успешно создан`
 			})
 		} catch (err) {
-			console.log(err)
+			console.log('Register error', err)
 		}
-})
+	})
+
+router.post('/login', loginValidators,
+	async (req, res) => {
+		try {
+			const errors = validationResult(req)
+
+			if (!errors.isEmpty()) {
+				return res.status(400).json({
+					errors: errors.array(),
+					message: 'Некорректные данные при входе в систему'
+				})
+			}
+
+			const { email, password } = req.body
+
+			const user = await User.findOne({ email })
+
+			if (!user) {
+				return res.status(400).json({
+					message: 'Пользователя с таким Email не существует'
+				})
+			}
+
+			const isMatch = await compare(password, user.password)
+
+			if (!isMatch) {
+				return res.status(400).json({ message: 'Неверный пароль' })
+			}
+
+			const token = jwt.sign(
+				{ userId: user.id },
+				config.get('jwtSecret'),
+				{ expiresIn: '1h' }
+			)
+
+			res.json({ token, userId: user.id })
+		} catch (err) {
+			console.log('Login error', err)
+		}
+	})
 
 module.exports = router
