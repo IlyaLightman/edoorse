@@ -14,7 +14,6 @@ const transporter = nodemailer.createTransport(sendgrid({
 	auth: { api_key: config.get('SENDGRID_API_KEY') }
 }))
 
-// /api/auth/register
 router.post('/register', registerValidators,
 	async (req, res) => {
 		try {
