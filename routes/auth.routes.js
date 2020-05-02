@@ -7,6 +7,7 @@ const { registerValidators, loginValidators } = require('../utils/validators')
 const User = require('../models/User')
 const nodemailer = require('nodemailer')
 const sendgrid = require('nodemailer-sendgrid-transport')
+const Course = require('../models/Course')
 
 const router = Router()
 
@@ -87,5 +88,15 @@ router.post('/login', loginValidators,
 			console.log('Login error', err)
 		}
 	})
+
+router.post('/dbtest', async (req, res) => {
+	const course = new Course({
+		title: 'course1',
+		description: 'course'
+	})
+	console.log(course)
+	await course.save()
+		.then(() => console.log('Success'))
+})
 
 module.exports = router

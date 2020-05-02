@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, Types } = require('mongoose')
 
 const userSchema = new Schema({
 	email: {
@@ -13,7 +13,13 @@ const userSchema = new Schema({
 	password: {
 		type: String,
 		required: true
-	}
+	},
+	courses: [
+		{
+			type: Types.ObjectId,
+			ref: 'Course'
+		}
+	]
 })
 
 module.exports = model('User', userSchema)
