@@ -1,31 +1,25 @@
-import React from 'react';
-import './App.css';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom'
+import React from 'react'
+import './App.css'
+import { Route, Switch, Redirect } from 'react-router-dom'
+import { AuthContext } from './context/AuthContext'
+import useAuth from './hooks/auth.hook'
+import AuthPage from './containers/AuthPage/AuthPage'
 
 function App() {
-  return (
-      <Switch>
-          <Route path='/' component={
-              <div className="App">
-                  <header className="App-header">
-                      <h1>Edoorse</h1>
-                      <button
-                          onClick={
-                              async () => {
-                                  await fetch('api/auth/dbtest', {
-                                      method: 'POST',
-                                      headers: {},
-                                      body: null
-                                  })
-                              }
-                          }
-                      >DB Test</button>
-                  </header>
-              </div>
-          } />
-          <Route path='/login' component={} />
-      </Switch>
-  );
+    const { token, login, logout, userId, ready } = useAuth()
+    const isAuthenticated = !!token
+
+	return (
+		<AuthContext.Provider value={{
+            token, login, logout, userId, isAuthenticated
+        }}>
+			<Switch>
+				<Route path='/auth' component={ AuthPage }/>
+				<Route path='/about' component={} />
+				<Redirect to='/auth' />
+			</Switch>
+		</AuthContext.Provider>
+	)
 }
 
-export default App;
+export default App
